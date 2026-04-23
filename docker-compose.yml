@@ -2,20 +2,37 @@ services:
   mongodb:
     image: mongo:7
     container_name: mongodb-replica
-    command: [ "--replSet", "rs0", "--bind_ip_all" ]
+    entrypoint: [ "/bin/bash", "/docker-entrypoint-mongo.sh" ]
     ports:
       - "27017:27017"
     environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-prismauser}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-prisma123}
       MONGO_INITDB_DATABASE: libraryAppPrisma
     volumes:
       - mongodb_data:/data/db
+      - ./mongo-keyfile:/tmp/mongo-keyfile:ro
+      - ./docker-entrypoint-mongo.sh:/docker-entrypoint-mongo.sh:ro
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--username",
+          "prismauser",
+          "--password",
+          "prisma123",
+          "--authenticationDatabase",
+          "admin",
+          "--eval",
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   app:
     build:
@@ -27,7 +44,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
-      DATABASE_URL: ${DOCKER_DATABASE_URL:-mongodb://mongodb:27017/libraryAppPrisma?directConnection=true&replicaSet=rs0}
+      DATABASE_URL: ${DOCKER_DATABASE_URL:-mongodb://prismauser:prisma123@mongodb:27017/libraryAppPrisma?authSource=admin&directConnection=true&replicaSet=rs0}
     env_file:
       - .env
     depends_on:
