@@ -13,6 +13,13 @@ import {
   getGenreById,
   updateGenre,
 } from '../controller/genre.controller';
+import {
+  createBook,
+  deleteBook,
+  getAllBooks,
+  getBookById,
+  updateBook,
+} from '../controller/book.controller';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
@@ -30,5 +37,12 @@ router.get('/genres', asyncHandler(getAllGenres));
 router.get('/genres/:id', asyncHandler(getGenreById));
 router.put('/genres/:id', asyncHandler(updateGenre));
 router.delete('/genres/:id', asyncHandler(deleteGenre));
+
+// Book routes
+router.post('/books', asyncHandler(createBook));
+router.get('/books', asyncHandler(getAllBooks)); // Supports ?authorId=xxx or ?genreId=xxx
+router.get('/books/:id', asyncHandler(getBookById));
+router.put('/books/:id', asyncHandler(updateBook));
+router.delete('/books/:id', asyncHandler(deleteBook));
 
 export default router;
