@@ -4,12 +4,13 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model Author {
@@ -24,27 +25,27 @@ model Author {
 }
 
 model Genre {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  name        String       @unique
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  name        String      @unique
   description String?
   books       BookGenre[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model Book {
-  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
   title         String
-  isbn          String?      @unique
-  author        Author       @relation("AuthorToBooks", fields: [authorId], references: [id])
-  authorId      String       @db.ObjectId
+  isbn          String?     @unique
+  author        Author      @relation("AuthorToBooks", fields: [authorId], references: [id])
+  authorId      String      @db.ObjectId
   genres        BookGenre[]
   publishedDate DateTime?
   pages         Int?
   description   String?
-  language      String       @default("English")
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  language      String      @default("English")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model BookGenre {
