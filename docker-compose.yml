@@ -44,7 +44,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
-      DATABASE_URL: ${DOCKER_DATABASE_URL:-mongodb://prismauser:prisma123@mongodb:27017/libraryAppPrisma?authSource=admin&directConnection=true&replicaSet=rs0}
+      DATABASE_URL: ${DOCKER_DATABASE_URL}
     env_file:
       - .env
     depends_on:
