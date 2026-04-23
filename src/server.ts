@@ -2,12 +2,15 @@ import express from 'express';
 import config from './config/config';
 import { prisma } from './config/prisma';
 import routes from './routes/routes';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
 app.use(express.json());
 
 app.use('/api', routes);
+
+app.use(errorHandler);
 
 const startServer = async () => {
   prisma.$connect().then(() => {
