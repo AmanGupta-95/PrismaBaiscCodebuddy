@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AuthorDTO, authorService } from '../services/author.service';
+import { AuthorDTO, authorService } from '../services/author.service.js';
 
 export const createAuthor = async (req: Request, res: Response) => {
   const author = await authorService.createAuthor(req.body as AuthorDTO);

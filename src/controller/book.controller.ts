@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { BookDTO, bookService } from '../services/book.service';
+import { BookDTO, bookService } from '../services/book.service.js';
 
 export const createBook = async (req: Request, res: Response) => {
   const book = await bookService.createBook(req.body as BookDTO);

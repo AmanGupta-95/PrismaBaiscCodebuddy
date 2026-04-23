@@ -1,5 +1,5 @@
-import { prisma } from '../config/prisma';
-import { ValidationError } from '../utils/AppError';
+import { prisma } from '../config/prisma.js';
+import { ValidationError } from '../utils/AppError.js';
 
 export interface AuthorDTO {
   name: string;

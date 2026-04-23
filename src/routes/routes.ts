@@ -5,22 +5,22 @@ import {
   getAllAuthors,
   getAuthorById,
   updateAuthor,
-} from '../controller/author.controller';
+} from '../controller/author.controller.js';
 import {
   createGenre,
   deleteGenre,
   getAllGenres,
   getGenreById,
   updateGenre,
-} from '../controller/genre.controller';
+} from '../controller/genre.controller.js';
 import {
   createBook,
   deleteBook,
   getAllBooks,
   getBookById,
   updateBook,
-} from '../controller/book.controller';
-import { asyncHandler } from '../utils/asyncHandler';
+} from '../controller/book.controller.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GenreDTO, genreService } from '../services/genre.service';
+import { GenreDTO, genreService } from '../services/genre.service.js';
 
 export const createGenre = async (req: Request, res: Response) => {
   const genre = await genreService.createGenre(req.body as GenreDTO);
