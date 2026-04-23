@@ -1,6 +1,5 @@
 import express from 'express';
 import config from './config/config';
-import { prisma } from './config/prisma';
 import routes from './routes/routes';
 import { errorHandler } from './middleware/errorHandler';
 
@@ -8,14 +7,18 @@ const app = express();
 
 app.use(express.json());
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Server is healthy',
+  });
+});
+
 app.use('/api', routes);
 
 app.use(errorHandler);
 
 const startServer = async () => {
-  prisma.$connect().then(() => {
-    console.log('Connected to the database successfully.');
-  });
   app.listen(config.port, () => {
     console.log(
       `Server is running on port ${config.port} in ${config.nodeEnv} mode.`,
@@ -24,7 +27,6 @@ const startServer = async () => {
 };
 
 startServer().catch((error) => {
-  prisma.$disconnect();
   console.error('Failed to start server:', error);
   process.exit(1);
 });
