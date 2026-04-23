@@ -46,6 +46,8 @@ model Book {
   language      String      @default("English")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@index([authorId, title])
 }
 
 model BookGenre {
