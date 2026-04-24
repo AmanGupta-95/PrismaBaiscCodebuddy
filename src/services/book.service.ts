@@ -118,10 +118,22 @@ export const bookService = {
     const book = await prisma.book.findUnique({
       where: { id },
       include: {
-        author: true,
+        author: {
+          include: {
+            _count: {
+              select: { books: true },
+            },
+          },
+        },
         genres: {
           include: {
-            genre: true,
+            genre: {
+              include: {
+                _count: {
+                  select: { books: true },
+                },
+              },
+            },
           },
         },
       },
@@ -131,27 +143,7 @@ export const bookService = {
       throw new ValidationError('Book not found');
     }
 
-    // Get total books by this author
-    const authorBooksCount = await prisma.book.count({
-      where: { authorId: book.authorId },
-    });
-
-    // Get total books for each genre
-    const genresWithCount = await Promise.all(
-      book.genres.map(async (bookGenre) => {
-        const genreBooksCount = await prisma.bookGenre.count({
-          where: { genreId: bookGenre.genreId },
-        });
-
-        return {
-          id: bookGenre.genre.id,
-          name: bookGenre.genre.name,
-          description: bookGenre.genre.description,
-          totalBooks: genreBooksCount,
-        };
-      }),
-    );
-
+    // Transform the response to match the expected format
     return {
       id: book.id,
       title: book.title,
@@ -168,9 +160,14 @@ export const bookService = {
         bio: book.author.bio,
         birthDate: book.author.birthDate,
         nationality: book.author.nationality,
-        totalBooks: authorBooksCount,
+        totalBooks: book.author._count.books,
       },
-      genres: genresWithCount,
+      genres: book.genres.map((bookGenre) => ({
+        id: bookGenre.genre.id,
+        name: bookGenre.genre.name,
+        description: bookGenre.genre.description,
+        totalBooks: bookGenre.genre._count.books,
+      })),
     };
   },
 

@@ -10,24 +10,28 @@ RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 # Set working directory
 WORKDIR /app
 
-# Build stage
-FROM base AS builder
+# Dependencies stage
+FROM base AS dependencies
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile
-
-# Copy prisma schema
 COPY prisma ./prisma
 
-# Generate Prisma Client
-RUN pnpm exec prisma generate
+# Install all dependencies and generate Prisma client
+RUN pnpm install --frozen-lockfile && \
+    pnpm exec prisma generate
 
-# Copy source code
+# Build stage
+FROM base AS builder
+
+# Copy dependencies from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies /app/package.json ./package.json
+
+# Copy source code and config
 COPY tsconfig.json ./
 COPY src ./src
+COPY prisma ./prisma
 
 # Build TypeScript
 RUN pnpm build
@@ -37,20 +41,19 @@ FROM base AS production
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma
 
 # Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
 
+# Copy generated Prisma client from dependencies stage
+COPY --from=dependencies /app/node_modules/.pnpm ./node_modules/.pnpm
+COPY --from=dependencies /app/node_modules/@prisma ./node_modules/@prisma
+
 # Copy built application from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist ./dist/
 
-# Copy generated Prisma client from builder
-COPY --from=builder /app/generated ./generated
-
-# Copy prisma schema (needed at runtime for some Prisma features)
-COPY prisma ./prisma
-
-# Change ownership to node user
+# Change ownership to node user and cleanup in single layer
 RUN chown -R node:node /app
 
 # Switch to non-root user
